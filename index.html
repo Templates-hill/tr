@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Tracker</title>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Location Tracker</h1>
+    <div id="map"></div>
+
+    <script>
+        // Check if the browser supports Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(showPosition, showError, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+
+        let map, marker;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 0, lng: 0 },
+                zoom: 2,
+            });
+            marker = new google.maps.Marker({
+                position: { lat: 0, lng: 0 },
+                map: map,
+                title: "Your Location",
+            });
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            const newPos = { lat, lng };
+            marker.setPosition(newPos);
+            map.setCenter(newPos);
+            map.setZoom(15);
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Load Google Maps API and initialize the map
+        function loadScript() {
+            const script = document.createElement("script");
+            script.src = "https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap";
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        window.onload = loadScript;
+    </script>
+</body>
+</html>
